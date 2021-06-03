@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import ro.pub.cs.systems.eim.practicaltest02.R;
 import ro.pub.cs.systems.eim.practicaltest02.general.Constants;
+import ro.pub.cs.systems.eim.practicaltest02.network.ServerThread;
 
 public class PracticalTest02 extends AppCompatActivity {
     // Server widgets
@@ -26,6 +27,8 @@ public class PracticalTest02 extends AppCompatActivity {
     private Spinner informationTypeSpinner = null;
     private TextView currencyTextView = null;
 
+    private ServerThread serverThread = null;
+
 
     private ConnectButtonClickListener connectButtonClickListener = new ConnectButtonClickListener();
     private class ConnectButtonClickListener implements Button.OnClickListener {
@@ -38,6 +41,12 @@ public class PracticalTest02 extends AppCompatActivity {
                 return;
             }
             Log.d(Constants.TAG, "[MAIN ACTIVITY] Server port: " + serverPort);
+            serverThread = new ServerThread(Integer.parseInt(serverPort));
+            if (serverThread.getServerSocket() == null) {
+                Log.e(Constants.TAG, "[MAIN ACTIVITY] Could not create server thread!");
+                return;
+            }
+            serverThread.start();
         }
 
     }
@@ -55,6 +64,15 @@ public class PracticalTest02 extends AppCompatActivity {
                 return;
             }
             Log.d(Constants.TAG, "[MAIN ACTIVITY] Client port: " + clientPort);
+
+            if (serverThread == null || !serverThread.isAlive()) {
+                Toast.makeText(getApplicationContext(), "[MAIN ACTIVITY] There is no server to connect to!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String informationType = informationTypeSpinner.getSelectedItem().toString();
+            Log.d(Constants.TAG, "[MAIN ACTIVITY]: " + informationType);
+            currencyTextView.setText(Constants.EMPTY_STRING);
         }
 
     }
@@ -80,6 +98,9 @@ public class PracticalTest02 extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         Log.i(Constants.TAG, "[MAIN ACTIVITY] onDestroy() callback method has been invoked");
+        if (serverThread != null) {
+            serverThread.stopThread();
+        }
         super.onDestroy();
     }
 }
