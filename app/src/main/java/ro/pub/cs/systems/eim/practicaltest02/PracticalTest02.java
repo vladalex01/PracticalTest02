@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import ro.pub.cs.systems.eim.practicaltest02.R;
 import ro.pub.cs.systems.eim.practicaltest02.general.Constants;
+import ro.pub.cs.systems.eim.practicaltest02.network.ClientThread;
 import ro.pub.cs.systems.eim.practicaltest02.network.ServerThread;
 
 public class PracticalTest02 extends AppCompatActivity {
@@ -28,6 +29,7 @@ public class PracticalTest02 extends AppCompatActivity {
     private TextView currencyTextView = null;
 
     private ServerThread serverThread = null;
+    private ClientThread clientThread = null;
 
 
     private ConnectButtonClickListener connectButtonClickListener = new ConnectButtonClickListener();
@@ -73,6 +75,11 @@ public class PracticalTest02 extends AppCompatActivity {
             String informationType = informationTypeSpinner.getSelectedItem().toString();
             Log.d(Constants.TAG, "[MAIN ACTIVITY]: " + informationType);
             currencyTextView.setText(Constants.EMPTY_STRING);
+
+            clientThread = new ClientThread(
+                    clientAddress, Integer.parseInt(clientPort), informationType, currencyTextView
+            );
+            clientThread.start();
         }
 
     }
